@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = EMAIL_PORT = str(os.getenv('SECRET_KEY'))
+SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -53,7 +53,9 @@ INSTALLED_APPS = [
     
     'mathfilters',
     
-    'crispy_forms' # Crispy forms
+    'crispy_forms', # Crispy forms
+    
+    'storages',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -94,10 +96,27 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+
+# For local database 
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+
+# For amazon RDS Posgres SQL
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': str(os.getenv('RDS_ENGINE')),
+        'NAME': str(os.getenv('RDS_NAME')),
+        'USER': str(os.getenv('RDS_USER')),
+        'PASSWORD': str(os.getenv('RDS_PASSWORD')),
+        'HOST': str(os.getenv('RDS_HOST')),
+        'PORT': str(os.getenv('RDS_PORT')),
     }
 }
 
@@ -164,3 +183,23 @@ EMAIL_HOST_PASSWORD =  str(os.getenv('EMAIL_HOST_PASSWORD'))
 # Allow Paypal Popups
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
+
+# AWS credentials:
+
+AWS_ACCESS_KEY_ID = str(os.getenv('AWS_ACCESS_KEY_ID'))
+AWS_SECRET_ACCESS_KEY = str(os.getenv('AWS_SECRET_ACCESS_KEY')) 
+
+# S3 config settings
+
+AWS_STORAGE_BUCKET_NAME = str(os.getenv('AWS_STORAGE_BUCKET_NAME'))
+
+DEFAULT_FILE_STORAGE = str(os.getenv('DEFAULT_FILE_STORAGE'))
+STATICFILES_STORAGE = str(os.getenv('STATICFILES_STORAGE'))
+
+AWS_S3_CUSTOM_DOMAIN = "%s.s3.amazonaws.com" % AWS_STORAGE_BUCKET_NAME
+
+AWS_S3_FILE_OVERWRITE = False
+
+# Admin styling adjustment
+
+ADMIN_MEDIA_PREFIX = '/static/admin/'
