@@ -8,6 +8,10 @@ from cart.cart import Cart
 
 from django.http import JsonResponse
 
+from django.core.mail import send_mail
+
+from django.conf import settings
+
 def checkout(request):
     
     # Users with account -- Pre-fill the form
@@ -76,9 +80,17 @@ def complete_order(request):
             
             order_id = order.pk
             
+            product_list = []
+            
             for item in cart:
                 
                 OrderItem.objects.create(order_id=order_id, product= item['product'], quantity = item['qty'], price = item['price'], user = request.user)
+                product_list.append(item['product'])
+            
+            all_products = product_list
+                        
+            send_mail('Order received', 'Hi! ' + '\n\n' + 'Thank you for placing your order.' + '\n\n' + 'Please see your order below:' + '\n\n' + str(all_products)
+                      + '\n\n' + 'Total paid: $' + str(cart.get_total()), settings.EMAIL_HOST_USER, [email], fail_silently=False,)
                 
         else:
             
@@ -88,9 +100,21 @@ def complete_order(request):
             
             order_id = order.pk
             
+            product_list = []
+            
             for item in cart:
                 
                 OrderItem.objects.create(order_id=order_id, product= item['product'], quantity = item['qty'], price = item['price'])
+                product_list.append(item['product'])
+        
+        
+            # Email order 
+            
+            all_products = product_list
+                        
+            send_mail('Order received', 'Hi! ' + '\n\n' + 'Thank you for placing your order' + '\n\n' + 'Please see your order below:' + '\n\n' + str(all_products)
+                      + '\n\n' + 'Total paid: $' + str(cart.get_total()), settings.EMAIL_HOST_USER, [email], fail_silently=False,)
+        
             
         order_success = True
         
